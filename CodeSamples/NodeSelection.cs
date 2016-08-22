@@ -59,16 +59,34 @@ namespace SecureCompileWrapper
             return root.DescendantNodes().OfType<T>().ToList<T>;
         }
 
-        // Gets full name of variable type in format Namespace.TypaName.
-        // For now only works for  PredefinedTypeSyntax (example: System.Int32) and  NullableTypeSyntax(example: System.Int32).
-        // For now DOESN'T WORK for GenericNameSyntax (example: Nullable<int>) and IdentifierNameSyntax (example: SomeUserDefinedClass). 
-        private string GetVariableTypeName<T> (T variable) where T : PredefinedTypeSyntax, NullableTypeSyntax, GenericNameSyntax, IdentifierNameSyntax
+        private List<VariableDeclarationSyntax> SelectVariables()
         {
-            if(variable != null)
+            return _root.DescendantNodes().OfType<VariableDeclarationSyntax>().ToList<VariableDeclarationSyntax>;
+        }
+
+        
+        private string GetVariableTypeName (VariableDeclarationSyntax variable) 
+        {
+            string result = string.Empty;
+            SymbolDisplayFormat symbolDisplayFormat = new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces);
+
+            if (variable != null)
             {
-                SymbolDisplayFormat symbolDisplayFormat = new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces);
-                TypeInfo variableModelInfo = semanticModel.GetTypeInfo(nullable);
-                return variableModelInfo.Type.ToDisplayString(symbolDisplayFormat);
+                SymbolInfo simbolInfo = semanticModel.GetSymbolInfo(referenceVariable.Type);
+
+                if(simbolInfo.Symbol != null)
+                {
+                    if (variable is GenericNameSyntax)
+                    {
+                        result = symbolInfo.Symbol.ToDisplayString();
+                    }
+                    else
+                    {
+                       result = symbolInfo.Symbol.ToDisplayString(symbolDisplayFormat);
+                    }
+                }
+             
+                return result;
             }
             else
             {
