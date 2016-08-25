@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Emit;
 
-namespace SecureCompileWrapper
+namespace SecureCompileWrapperTool
 {
     public class CodeAnalyzer
     {
